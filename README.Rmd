@@ -8,6 +8,13 @@ output: github_document
 
 # Choosing a dataset from the `datateachr` package
 
+First load the libraries
+
+```{r}
+library(datateachr)
+library(tidyverse)
+```
+
 From the 7 datasets in `datateachr` my top 4 choices are:
 
 1. `cancer_sample`: characteristics of cell nuclei from digitized images of breast mass
