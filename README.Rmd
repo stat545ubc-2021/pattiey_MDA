@@ -1,0 +1,188 @@
+---
+title: "README"
+author: "pattiey"
+date: "04/10/2021"
+output: github_document
+---
+# Pattie Ye's Mini Data Analysis
+
+# Choosing a dataset from the `datateachr` package
+
+From the 7 datasets in `datateachr` my top 4 choices are:
+
+1. `cancer_sample`: characteristics of cell nuclei from digitized images of breast mass
+
+```{r}
+# Look at column names
+names(cancer_sample)
+
+# Dimensions
+dim(cancer_sample)
+
+# Data class of each column
+sapply(cancer_sample, class)
+```
+
+2. `vancouver_trees`: listing of public trees on boulevards in the City of Vancouver 
+
+```{r}
+# Look at column names
+names(vancouver_trees)
+
+# Dimensions
+dim(vancouver_trees)
+
+# Data type of each column
+sapply(vancouver_trees, class)
+```
+
+3. `flow_sample`: Maximum and minimum recorded mean daily flow recorded at the Bow River Station in Banff 
+
+```{r}
+# Look at column names
+names(flow_sample)
+
+# Dimensions
+dim(flow_sample)
+
+# Data type of each column
+sapply(flow_sample, class)
+```
+
+4. `parking_meters`: information on rates and time limits for parking meters in the City of Vancouver 
+
+```{r}
+# Look at column names
+names(parking_meters)
+
+# Dimensions
+dim(parking_meters)
+
+# Data type of each column
+sapply(parking_meters, class)
+```
+
+# Top 2 choices:
+
+* `vancouver_trees`
+* `flow_sample`
+
+## `vancouver_trees`
+
+```{r}
+# Looking at vancouver_trees to get an idea of values
+glimpse(vancouver_trees)
+
+# Look at how many unique values exist in each feature in vancouver_trees
+vancouver_trees %>% sapply(unique) %>% sapply(length)
+
+# The height_range_id variable is ambiguous, look at what values it takes on 
+unique(vancouver_trees$height_range_id)
+# height range is between 0 and 10
+
+# Look at all fields with only 2 unique values
+unique(vancouver_trees$assigned)
+unique(vancouver_trees$root_barrier)
+unique(vancouver_trees$curb)
+# They all seem to be Y/N (boolean) type features
+
+# What is street side name describing?
+unique(vancouver_trees$street_side_name)
+# Where on the street is the tree located on
+
+# I'm not too sure what plant_area is. 
+unique(vancouver_trees$plant_area)
+```
+
+`vancouver_trees` describes information about public trees planted on boulevards in the City of Vancouver. This dataset interests me because there are so many different types of information available, such as location, type of tree, and date planted. 
+With this data, I could answer a variety of different questions, such as the location of trees planted in Vancouver, or how the number of trees planted vary from year to year, or how the trees vary physically depending on tree type. 
+
+## `flow_sample`
+
+```{r}
+# Looking at flow_sample to get an idea of values 
+glimpse(flow_sample)
+
+# How many unique values exist for each feature
+flow_sample %>% sapply(unique) %>% sapply(length)
+
+# Confirm that extreme_type is either max or min
+unique(flow_sample$extreme_type)
+
+# How is it that there are 32 unique values for day
+unique(flow_sample$day)
+# there are NA values... how many?
+sum(is.na(flow_sample$day))
+```
+
+`flow_sample` contains information about the daily flow data for the Bow River at Banff. Although the data is relatively simple, it can answer many interesting questions. Some questions that can be answered are how flow has changed over time, during what months do the extremes typically happen. 
+
+# Final choice
+
+`vancouver_trees` seems more interesting to play around with since there are so many different types of features that can demonstrate a large variety of information. 
+
+# Exploring My Dataset
+
+I'm interested in seeing how the number of trees planted varies from year to year, so I need a variable that contains only the year from `date_planted` called `year_planted`
+
+```{r}
+# I need the lubridate package to efficiently extract the date
+library(lubridate)
+vancouver_trees <- vancouver_trees %>% 
+  mutate(year_planted = year(date_planted))
+```
+
+I would like to see how the number of trees planted changed year to year
+
+```{r}
+ggplot(vancouver_trees, aes(year_planted)) + geom_density() + theme_classic() + xlab("Year") + ggtitle("Density of trees planted per year")
+```
+
+I now want to see how that distribution changes by neighbourhood
+
+```{r}
+# I need the ggridges package
+library(ggridges)
+ggplot(vancouver_trees, aes(x = year_planted, y = neighbourhood_name)) + geom_density_ridges() + xlab("Year") + ylab("Neighbourhood") + ggtitle("Density of trees planted per year, by neighbourhood")
+```
+
+I'd also like to see how many trees there are in each neighbourhood.
+
+```{r}
+ggplot(vancouver_trees, aes(neighbourhood_name)) + geom_bar() + theme(axis.text.x = element_text(angle = 90)) + xlab("Neighbourhood") + ggtitle("Number of trees planted per neighbourhood")
+```
+
+This is sort of hard to interpret as a graph, I'd like to just see it as a table instead.
+
+```{r}
+vancouver_trees %>% group_by(neighbourhood_name) %>% count()
+```
+
+I'm most interested in the trees in my neighbourhood, Kitsilano, where there are 8115 trees. I only care about trees that are greater than 25 and less than 100 in diameter. O want information about the location first and then the rest.
+
+```{r}
+kits_trees <- vancouver_trees %>% 
+  filter(neighbourhood_name == "KITSILANO") %>% 
+  select(on_street, on_street_block, street_side_name, curb, longitude, latitude, everything())
+```
+
+I want to see where in kits trees between 25 and 100 in diameter are planted and where on the street they are.
+
+```{r}
+kits_trees %>% 
+  filter(diameter >= 25, diameter <= 100) %>% 
+  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter))
+```
+
+There appears to be one outlying tree in longitude, I want to filter that out.
+
+```{r}
+kits_trees %>% 
+  filter(diameter >= 25, diameter <= 100, longitude < -123.1) %>% 
+  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter, alpha = 0.2))
+```
+
+# Research questions
+
+* 
+
