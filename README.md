@@ -381,6 +381,7 @@ library(lubridate)
 
 ``` r
 vancouver_trees <- vancouver_trees %>% 
+  # use year() from lubridate to extract year from date
   mutate(year_planted = year(date_planted))
 ```
 
@@ -441,8 +442,9 @@ vancouver_trees %>% group_by(neighbourhood_name) %>% count()
 
 I’m most interested in the trees in my neighbourhood, Kitsilano, where
 there are 8115 trees. I only care about trees that are greater than 25
-and less than 100 in diameter. O want information about the location
-first and then the rest.
+and less than 100 in diameter. I want information about the location
+first and then the rest since I would like to know the geographic
+location of these trees.
 
 ``` r
 kits_trees <- vancouver_trees %>% 
@@ -456,7 +458,7 @@ planted and where on the street they are.
 ``` r
 kits_trees %>% 
   filter(diameter >= 25, diameter <= 100) %>% 
-  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter))
+  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter, alpha = 0.2)) + ggtitle("Location of trees in Kitsilano")
 ```
 
     ## Warning: Removed 129 rows containing missing values (geom_point).
@@ -469,11 +471,19 @@ that out.
 ``` r
 kits_trees %>% 
   filter(diameter >= 25, diameter <= 100, longitude < -123.1) %>% 
-  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter, alpha = 0.2))
+  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter, alpha = 0.2)) + ggtitle("Location of trees in Kitsilano")
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 # Research questions
 
--   
+-   How have tree planting patterns changed over years?
+
+-   What are the most popular species of trees in Vancouver, does that
+    change by neighbourhood?
+
+-   Which streets in Vancouver are most densely populated with trees?
+
+-   Where can you find the largest (tallest and widest) trees in
+    Vancouver?

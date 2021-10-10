@@ -135,7 +135,9 @@ I'm interested in seeing how the number of trees planted varies from year to yea
 ```{r}
 # I need the lubridate package to efficiently extract the date
 library(lubridate)
+
 vancouver_trees <- vancouver_trees %>% 
+  # use year() from lubridate to extract year from date
   mutate(year_planted = year(date_planted))
 ```
 
@@ -165,7 +167,7 @@ This is sort of hard to interpret as a graph, I'd like to just see it as a table
 vancouver_trees %>% group_by(neighbourhood_name) %>% count()
 ```
 
-I'm most interested in the trees in my neighbourhood, Kitsilano, where there are 8115 trees. I only care about trees that are greater than 25 and less than 100 in diameter. O want information about the location first and then the rest.
+I'm most interested in the trees in my neighbourhood, Kitsilano, where there are 8115 trees. I only care about trees that are greater than 25 and less than 100 in diameter. I want information about the location first and then the rest since I would like to know the geographic location of these trees.
 
 ```{r}
 kits_trees <- vancouver_trees %>% 
@@ -178,7 +180,7 @@ I want to see where in kits trees between 25 and 100 in diameter are planted and
 ```{r}
 kits_trees %>% 
   filter(diameter >= 25, diameter <= 100) %>% 
-  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter))
+  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter, alpha = 0.2)) + ggtitle("Location of trees in Kitsilano")
 ```
 
 There appears to be one outlying tree in longitude, I want to filter that out.
@@ -186,10 +188,16 @@ There appears to be one outlying tree in longitude, I want to filter that out.
 ```{r}
 kits_trees %>% 
   filter(diameter >= 25, diameter <= 100, longitude < -123.1) %>% 
-  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter, alpha = 0.2))
+  ggplot(aes(longitude, latitude)) + geom_point(aes(col = street_side_name, size = diameter, alpha = 0.2)) + ggtitle("Location of trees in Kitsilano")
 ```
 
 # Research questions
 
-* 
+* How have tree planting patterns changed over years?
+
+* What are the most popular species of trees in Vancouver, does that change by neighbourhood?
+
+* Which streets in Vancouver are most densely populated with trees?
+
+* Where can you find the largest (tallest and widest) trees in Vancouver?
 
