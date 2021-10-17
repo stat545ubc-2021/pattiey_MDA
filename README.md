@@ -42,8 +42,6 @@ Sharpen results obtained from previous milestone by:
 | `README.md` | README file to describe this project and its structure |
 | `Milestone1.md` | File containing work for Milestone 1 |
 | `Milestone2.md` | File containing work for Milestone 2 |
-| `milestone1_desc.md` | Assignment description for Milestone 1 (from course page) | 
-| `milestone2_desc.md` | Assignment description for Milestone 2 (from course page) | 
 
 ### R Markdown files
 
