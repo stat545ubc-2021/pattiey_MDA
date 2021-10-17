@@ -42,10 +42,8 @@ Sharpen results obtained from previous milestone by:
 | `README.md` | README file to describe this project and its structure |
 | `Milestone1.md` | File containing work for Milestone 1 |
 | `Milestone2.md` | File containing work for Milestone 2 |
-| `Milestone3.md` | File containing work for Milestone 3 |
 | `milestone1_desc.md` | Assignment description for Milestone 1 (from course page) | 
 | `milestone2_desc.md` | Assignment description for Milestone 2 (from course page) | 
-| `milestone3_desc.md` | Assignment description for Milestone 3 (from course page) | 
 
 ### R Markdown files
 
@@ -53,10 +51,8 @@ Sharpen results obtained from previous milestone by:
 | :--- | ---: |
 | `Milestone1.Rmd` | R Markdown to generate `Milestone1.md` |
 | `Milestone2.Rmd` | R Markdown to generate `Milestone2.md` |
-| `Milestone3.Rmd` | R Markdown to generate `Milestone3.md` |
 | `milestone1_desc.Rmd` | R Markdown to generate `milestone1_desc.md` | 
 | `milestone2_desc.Rmd` | R Markdown to generate `milestone2_desc.md` | 
-| `milestone3_desc.Rmd` | R Markdown to generate `milestone3_desc.md` | 
 
 ### Other files/directories
 
@@ -64,5 +60,4 @@ Sharpen results obtained from previous milestone by:
 | :--- | ---: |
 | `Milestone1_files` | Directory containing figures for `Milestone1.md` | 
 | `Milestone2_files` | Directory containing figures for `Milestone2.md` | 
-| `Milestone3_files` | Directory containing figures for `Milestone3.md` | 
 | `.gitignore` | Instructs Git on the files to ignore | 

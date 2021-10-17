@@ -537,3 +537,5 @@ vancouver_trees %>%
 
 Indeed it does. From this, it is clear that as the height increases, the
 average tree diameter also increases.
+
+## 1.3 Assess research questions
