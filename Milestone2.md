@@ -27,7 +27,7 @@ Research questions are changed from milestone 1 to be more specific.
     time.
 
 2.  Is there a difference in the frequency of certain species of trees
-    between neighbourhoods? What is the most popular species of tree
+    between neighbourhoods? What are the most popular species of tree
     within Vancouver and which neighbourhoods are these trees mostly
     found?
 
@@ -185,7 +185,7 @@ neighbourhood.
 ### Research Question 2
 
 *Is there a difference in the frequency of certain species of trees
-between neighbourhoods? What is the most popular species of tree within
+between neighbourhoods? What are the most popular species of tree within
 Vancouver and which neighbourhoods are these trees mostly found?*
 
 First, we shall look at summary statistics of the number of trees per
@@ -539,3 +539,118 @@ Indeed it does. From this, it is clear that as the height increases, the
 average tree diameter also increases.
 
 ## 1.3 Assess research questions
+
+# Task 2: Tidy my data
+
+## 2.1 Is my data tidy?
+
+I believe my data is tidy. Each row represents one tree (one
+observation), each column represents a different variable describing the
+tree, and each cell represents the value corresponding to that tree. To
+be sure, let’s go through the 8 variables:
+
+-   `tree_id`
+-   `std_street`
+-   `common_name`
+-   `height_range_id`
+-   `diameter`
+-   `date_planted`
+-   `longitude`
+-   `latitude`
+
+``` r
+vars_of_interest <- c("tree_id", "std_street", "common_name", "height_range_id", "diameter", "date_planted", "longitude", "latitude")
+
+vancouver_trees %>% select(vars_of_interest)
+```
+
+    ## Note: Using an external vector in selections is ambiguous.
+    ## ℹ Use `all_of(vars_of_interest)` instead of `vars_of_interest` to silence this message.
+    ## ℹ See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
+    ## This message is displayed once per session.
+
+    ## # A tibble: 146,611 × 8
+    ##    tree_id std_street    common_name           height_range_id diameter date_planted
+    ##      <dbl> <chr>         <chr>                           <dbl>    <dbl> <date>      
+    ##  1  149556 W 58TH AV     BRANDON ELM                         2     10   1999-01-13  
+    ##  2  149563 W 58TH AV     JAPANESE ZELKOVA                    4     10   1996-05-31  
+    ##  3  149579 WINDSOR ST    JAPANESE SNOWBELL                   3      4   1993-11-22  
+    ##  4  149590 E 39TH AV     AUTUMN APPLAUSE ASH                 4     18   1996-04-29  
+    ##  5  149604 WINDSOR ST    HEDGE MAPLE                         2      9   1993-12-17  
+    ##  6  149616 W 61ST AV     CHANTICLEER PEAR                    2      5   NA          
+    ##  7  149617 SHERBROOKE ST COLUMNAR NORWAY MAPLE               3     15   1993-12-16  
+    ##  8  149618 SHERBROOKE ST COLUMNAR NORWAY MAPLE               3     14   1993-12-16  
+    ##  9  149619 SHERBROOKE ST COLUMNAR NORWAY MAPLE               2     16   1993-12-16  
+    ## 10  149625 E 39TH AV     AUTUMN APPLAUSE ASH                 2      7.5 1993-12-03  
+    ## # … with 146,601 more rows, and 2 more variables: longitude <dbl>,
+    ## #   latitude <dbl>
+
+From we can assess what the value in each variable is representing.
+
+| Variable          | Value                                             |
+|-------------------|---------------------------------------------------|
+| `tree_id`         | The ID of a given tree                            |
+| `std_street`      | The street where a given tree is located          |
+| `common_name`     | The common name of the species/cultivar of a tree |
+| `height_range_id` | Categorized height of a given tree                |
+| `diameter`        | Diameter across the trunk of a given tree         |
+| `date_planted`    | The date when a given tree was planted            |
+| `longitude`       | The longitude of a given tree                     |
+| `latitude`        | The latitude of a given tree                      |
+
+## 2.2 Untidying my data
+
+I can untidy my data by using `pivot_longer` to create a new variable
+called `location_metric` that will either be `longitude` or `latitude`
+and the value will be the longitudinal or latitudinal coordinate of the
+tree. This will untidy the data since there will be two rows per tree
+
+``` r
+(untidy_vancouver_trees <- vancouver_trees %>% 
+   select(vars_of_interest) %>% 
+   pivot_longer(cols = c(longitude, latitude),
+                names_to = "location_metric", 
+                values_to = "coordinate")) %>% 
+  select(location_metric, coordinate, everything())
+```
+
+    ## # A tibble: 293,222 × 8
+    ##    location_metric coordinate tree_id std_street common_name         height_range_id
+    ##    <chr>                <dbl>   <dbl> <chr>      <chr>                         <dbl>
+    ##  1 longitude           -123.   149556 W 58TH AV  BRANDON ELM                       2
+    ##  2 latitude              49.2  149556 W 58TH AV  BRANDON ELM                       2
+    ##  3 longitude           -123.   149563 W 58TH AV  JAPANESE ZELKOVA                  4
+    ##  4 latitude              49.2  149563 W 58TH AV  JAPANESE ZELKOVA                  4
+    ##  5 longitude           -123.   149579 WINDSOR ST JAPANESE SNOWBELL                 3
+    ##  6 latitude              49.2  149579 WINDSOR ST JAPANESE SNOWBELL                 3
+    ##  7 longitude           -123.   149590 E 39TH AV  AUTUMN APPLAUSE ASH               4
+    ##  8 latitude              49.2  149590 E 39TH AV  AUTUMN APPLAUSE ASH               4
+    ##  9 longitude           -123.   149604 WINDSOR ST HEDGE MAPLE                       2
+    ## 10 latitude              49.2  149604 WINDSOR ST HEDGE MAPLE                       2
+    ## # … with 293,212 more rows, and 2 more variables: diameter <dbl>,
+    ## #   date_planted <date>
+
+Tidy this back up with `pivot_wider` to get one row per tree again.
+
+``` r
+untidy_vancouver_trees %>% 
+  pivot_wider(names_from = location_metric, values_from = coordinate) %>% 
+  select(longitude, latitude, everything())
+```
+
+    ## # A tibble: 146,611 × 8
+    ##    longitude latitude tree_id std_street  common_name   height_range_id diameter
+    ##        <dbl>    <dbl>   <dbl> <chr>       <chr>                   <dbl>    <dbl>
+    ##  1     -123.     49.2  149556 W 58TH AV   BRANDON ELM                 2     10  
+    ##  2     -123.     49.2  149563 W 58TH AV   JAPANESE ZEL…               4     10  
+    ##  3     -123.     49.2  149579 WINDSOR ST  JAPANESE SNO…               3      4  
+    ##  4     -123.     49.2  149590 E 39TH AV   AUTUMN APPLA…               4     18  
+    ##  5     -123.     49.2  149604 WINDSOR ST  HEDGE MAPLE                 2      9  
+    ##  6     -123.     49.2  149616 W 61ST AV   CHANTICLEER …               2      5  
+    ##  7     -123.     49.2  149617 SHERBROOKE… COLUMNAR NOR…               3     15  
+    ##  8     -123.     49.2  149618 SHERBROOKE… COLUMNAR NOR…               3     14  
+    ##  9     -123.     49.2  149619 SHERBROOKE… COLUMNAR NOR…               2     16  
+    ## 10     -123.     49.2  149625 E 39TH AV   AUTUMN APPLA…               2      7.5
+    ## # … with 146,601 more rows, and 1 more variable: date_planted <date>
+
+## 2.3 Picking 2 research questions

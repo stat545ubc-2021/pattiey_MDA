@@ -25,7 +25,7 @@ Research questions are changed from milestone 1 to be more specific.
 
 1. How has the frequency of trees planted by neighbourhood changed over time? And on a broader scale, how has it changed by decade? This could reflect the rate of development of certain neighbourhoods over time.
 
-2. Is there a difference in the frequency of certain species of trees between neighbourhoods? What is the most popular species of tree within Vancouver and which neighbourhoods are these trees mostly found?
+2. Is there a difference in the frequency of certain species of trees between neighbourhoods? What are the most popular species of tree within Vancouver and which neighbourhoods are these trees mostly found?
 
 3. How does the number of trees planted change depending on the season?
 
@@ -118,7 +118,7 @@ From this we see that the average rate of trees being planted per neighbourhood 
 
 ### Research Question 2
 
-*Is there a difference in the frequency of certain species of trees between neighbourhoods? What is the most popular species of tree within Vancouver and which neighbourhoods are these trees mostly found?*
+*Is there a difference in the frequency of certain species of trees between neighbourhoods? What are the most popular species of tree within Vancouver and which neighbourhoods are these trees mostly found?*
 
 First, we shall look at summary statistics of the number of trees per type of tree in each neighbourhood. For each neighbourhood, find the mean, the median, min, and max number of trees per type, the most popular type of tree, and the total number of trees.
 
@@ -323,5 +323,62 @@ vancouver_trees %>%
 Indeed it does. From this, it is clear that as the height increases, the average tree diameter also increases.
 
 ## 1.3 Assess research questions
+
+# Task 2: Tidy my data
+
+## 2.1 Is my data tidy?
+
+I believe my data is tidy. Each row represents one tree (one observation), each column represents a different variable describing the tree, and each cell represents the value corresponding to that tree. To be sure, let's go through the 8 variables:
+
+* `tree_id`
+* `std_street`
+* `common_name`
+* `height_range_id`
+* `diameter`
+* `date_planted`
+* `longitude`
+* `latitude`
+
+```{r}
+vars_of_interest <- c("tree_id", "std_street", "common_name", "height_range_id", "diameter", "date_planted", "longitude", "latitude")
+
+vancouver_trees %>% select(vars_of_interest)
+```
+
+From we can assess what the value in each variable is representing.
+
+| Variable | Value |
+| --- | --- |
+| `tree_id` | The ID of a given tree |
+| `std_street` | The street where a given tree is located |
+| `common_name` | The common name of the species/cultivar of a tree |
+| `height_range_id` | Categorized height of a given tree |
+| `diameter` | Diameter across the trunk of a given tree |
+| `date_planted` | The date when a given tree was planted |
+| `longitude` | The longitude of a given tree |
+| `latitude` | The latitude of a given tree |
+
+## 2.2 Untidying my data
+
+I can untidy my data by using `pivot_longer` to create a new variable called `location_metric` that will either be `longitude` or `latitude` and the value will be the longitudinal or latitudinal coordinate of the tree. This will untidy the data since there will be two rows per tree
+
+```{r}
+(untidy_vancouver_trees <- vancouver_trees %>% 
+   select(vars_of_interest) %>% 
+   pivot_longer(cols = c(longitude, latitude),
+                names_to = "location_metric", 
+                values_to = "coordinate")) %>% 
+  select(location_metric, coordinate, everything())
+```
+
+Tidy this back up with `pivot_wider` to get one row per tree again.
+
+```{r}
+untidy_vancouver_trees %>% 
+  pivot_wider(names_from = location_metric, values_from = coordinate) %>% 
+  select(longitude, latitude, everything())
+```
+
+## 2.3 Picking 2 research questions
 
 
