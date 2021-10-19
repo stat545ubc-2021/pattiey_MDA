@@ -3,7 +3,7 @@
 ## Milestones
 
 - [x] Milestone 1: Due October 9, 2021
-- [ ] Milestone 2: Due October 19, 2021
+- [x] Milestone 2: Due October 19, 2021
 - [ ] Milestone 3: Due October 28, 2021
 
 ## Purpose of this repository
@@ -49,8 +49,6 @@ Sharpen results obtained from previous milestone by:
 | :--- | ---: |
 | `Milestone1.Rmd` | R Markdown to generate `Milestone1.md` |
 | `Milestone2.Rmd` | R Markdown to generate `Milestone2.md` |
-| `milestone1_desc.Rmd` | R Markdown to generate `milestone1_desc.md` | 
-| `milestone2_desc.Rmd` | R Markdown to generate `milestone2_desc.md` | 
 
 ### Other files/directories
 
