@@ -29,7 +29,7 @@ Research questions are changed from milestone 1 to be more specific.
 
 3. How does the number of trees planted change depending on the season?
 
-4. Is there a relationship between the height and width of trees? Are these trees found in geographically similar areas or are they scattered throughout the city?
+4. Is there a relationship between the height and width of trees? Are these larger trees found in geographically similar areas or are they scattered throughout the city?
 
 ## 1.2 Summarizing and graphing
 
@@ -273,7 +273,7 @@ The most informative histogram in this case would be that one with `binwidth = 7
 
 ### Research Question 4
 
-*Is there a relationship between the height and width of trees? Are these trees found in geographically similar areas or are they scattered throughout the city?*
+*Is there a relationship between the height and width of trees? Are these larger trees found in geographically similar areas or are they scattered throughout the city?*
 
 Since `height_range_id` is an ID variable, it can be viewed as a categorical variable. Let's look at the summary statistics of `diameter` across the different `height_range_id` values. 
 
@@ -300,19 +300,19 @@ Based on the median and mean values, it appears that a higher `height_range_id` 
 Here, we plot the diameter against `height_range_id` using a jitter plot.
 
 ```{r}
-vancouver_trees %>% ggplot(aes(factor(height_range_id, levels = 1:10), diameter)) + geom_jitter(height = 0, alpha = 0.1) + labs(y = "Diameter", x = "Height range ID", title = "Tree diameter vs. Height range ID")
+vancouver_trees %>% ggplot(aes(factor(height_range_id, levels = 0:10), diameter)) + geom_jitter(height = 0, alpha = 0.1) + labs(y = "Diameter", x = "Height range ID", title = "Tree diameter vs. Height range ID")
 ```
 
 This is extremely difficult to read. Use a $$log_{10}$$ transform on the y-axis. 
 
 ```{r}
-vancouver_trees %>% ggplot(aes(factor(height_range_id, levels = 1:10), diameter)) + geom_jitter(height = 0, alpha = 0.2) + scale_y_continuous(trans = 'log10') + labs(y = "Diameter", x = "Height range ID", title = "Tree diameter vs. Height range ID")
+vancouver_trees %>% ggplot(aes(factor(height_range_id, levels = 0:10), diameter)) + geom_jitter(height = 0, alpha = 0.2) + scale_y_continuous(trans = 'log10') + labs(y = "Diameter", x = "Height range ID", title = "Tree diameter vs. Height range ID")
 ```
-This still is not great, but is better. You can see that as the `height_range_id` increases, the number of smaller diameter trees decreases. Perhaps using a box plot will give something more interpretable.
+This still is not great, but is better. You can see that, generally, as the `height_range_id` increases, the number of smaller diameter trees decreases. Perhaps using a box plot will give something more interpretable.
 
 ```{r}
 vancouver_trees %>% 
-  ggplot(aes(factor(height_range_id, levels = 1:10), diameter)) + 
+  ggplot(aes(factor(height_range_id, levels = 0:10), diameter)) + 
   geom_boxplot(alpha = 0.2) + 
   scale_y_continuous(trans = 'log10') + 
   labs(y = "Diameter", 
@@ -320,9 +320,48 @@ vancouver_trees %>%
        title = "Box plot of tree diameter vs. height range ID")
 ```
 
-Indeed it does. From this, it is clear that as the height increases, the average tree diameter also increases.
+Indeed it does. From this, it is clear that in general, as the height increases, the average tree diameter also increases.
+
+For fun, I want to see if the presence of a root barrier has any relationship with diameter. 
+
+```{r}
+vancouver_trees %>% 
+  ggplot(aes(factor(height_range_id, levels = 0:10), diameter, color = root_barrier)) + 
+  geom_boxplot(alpha = 0.2) + 
+  scale_y_continuous(trans = 'log10') + 
+  labs(y = "Diameter", 
+       x = "Height range ID", 
+       title = "Box plot of tree diameter vs. height range ID",
+       color = "Root barrier")
+```
+
+In general, it appears that the presence of a root barrier corresponds to a lower tree diameter.
 
 ## 1.3 Assess research questions
+
+### Research Question 1
+
+*How has the frequency of trees planted by neighbourhood changed over time? And on a broader scale, how has it changed by decade? This could reflect the rate of development of certain neighbourhoods over time.*
+
+I am closer to answering this question in that I have identified the different distributions of number of trees planted per year in each neighbourhood. From this we see that the 2000's had the highest average number of neighbourhood trees planted annually. What remains unclear is which neighbourhoods saw the greatest amounts of growth in each decade and which neighbourhoods had the biggest variation of trees planted between decades. I'd like to refine my research question to be: which neighbourhoods saw the greatest rate of trees planted per decade? Are there any neighbourhoods that have only recently seen a high rate of tree planting (last 5 years?) and conversely, are there any neighbourhoods that have drastically slowed down in their rate of tree planting?
+
+### Research Question 2
+
+*Is there a difference in the frequency of certain species of trees between neighbourhoods? What are the most popular species of tree within Vancouver and which neighbourhoods are these trees mostly found?*
+
+I have identified the most popular types of trees within each neighbourhood and throughout Vancouver as a whole. What remains to be answered is the specific neighbourhoods where the most popular trees are mainly found. It would also be interesting to see if all the popular trees are concentrated in one area in the neighbourhood or are scattered around.
+
+### Research Question 3
+
+*How does the number of trees planted change depending on the season?*
+
+I think this question has been sufficiently answered. The number of trees planted decreases as the weather gets warmer in the Summer months, as well as in late December/early January surrounding the holiday season. It may be interesting to create a time series model for the number of trees planted through time.
+
+### Research Question 4
+
+*Is there a relationship between the height and width of trees? Are these larger trees found in geographically similar areas or are they scattered throughout the city?*
+
+From the data exploration, we found that on average, a larger `height_range_id` corresponds to a larger diameter, which answers the first part of the question. The second part of the research remains unanswered. It would be interesting to explore the geographic relationship between the trees that are taller (ex. `height_range_id` > 5) and wider in diameter (ex. `diameter > 20`). It would also be interesting to see if the age of a tree (based on `date_planted`) has any relationship with the height or diameter of a tree.
 
 # Task 2: Tidy my data
 
@@ -380,5 +419,97 @@ untidy_vancouver_trees %>%
 ```
 
 ## 2.3 Picking 2 research questions
+
+I would like to continue exploring research questions 1 and 4. 
+
+### Research Question 1
+
+*How has the frequency of trees planted by neighbourhood changed over time? Which neighbourhoods saw the greatest rate of trees planted per decade? Are there any neighbourhoods that have only recently seen a high rate of tree planting (last 5 years?) and conversely, are there any neighbourhoods that have drastically slowed down in their rate of tree planting?*
+
+This question mainly interests me because of the potential it has to serve as a signal of development in neighbourhoods.There are many different angles from which I can approach this question. 
+
+I want to explore the refined version of this question, looking at the relative rate of trees planted per decade in each neighbourhood. 
+
+To answer this question, I need to first filter out observations that do not have `date_planted` information.
+
+```{r}
+# keep modified dataset to answer question 1 as q1_data
+(q1_data <- vancouver_trees %>% 
+  filter(!is.na(date_planted)))
+```
+
+I only really need neighbourhood and date information in order to answer this question, so I can just select the relevant variables.
+
+```{r}
+(q1_data <- q1_data %>% 
+  select(neighbourhood_name, date_planted))
+```
+
+Since I'm interested in looking at the annual rate of planting, I'll create a `year_planted` variable.
+
+```{r}
+(q1_data <- q1_data %>% 
+  mutate(year_planted = lubridate::year(date_planted)))
+```
+
+Rather than looking at the data from a tree-by-tree basis, I'd rather explore by neighbourhood. 
+
+```{r}
+(q1_data <- q1_data %>% 
+  group_by(neighbourhood_name, year_planted) %>% 
+  summarise(trees_planted = n()))
+```
+
+I would like 1 row per neighbourhood, with each annual number of trees planted as a variable.
+
+```{r}
+(q1_data <- q1_data %>% 
+  pivot_wider(names_from = year_planted, values_from = trees_planted))
+```
+
+There are a few NA values, these are years where no trees were recorded, replace the NA values with 0
+
+```{r}
+(q1_data <- q1_data %>% 
+  replace(is.na(.), 0))
+```
+
+### Research Question 4 (Now referred to as question 2)
+
+*Is there a relationship between the height and width of trees? Are these larger trees found in geographically similar areas or are they scattered throughout the city?*
+
+I'd like to continue exploring this questions because I have not yet answered the second part of it. I'd also like to add a part to this question that explores the relationship between the age of a tree (based on `date_planted`) and the size of the tree.
+
+I would like to only keep the relevant variables to the question, which are `height_range_id`, `diameter`, `latitude`, `longitude`, `date_planted`. It may be useful to have `on_street_block`, `on_street`, `root_barrier`, `common_name`, and `neighbourhood_name` as well for the exploration. 
+
+```{r}
+(q2_data <- vancouver_trees %>% 
+  select(height_range_id, diameter, latitude, longitude, date_planted, on_street_block, on_street, root_barrier, common_name, neighbourhood_name))
+```
+
+Height range ID is currently a double type, since it is an ID value, it would make more sense to cast it to a factor. 
+
+```{r}
+(q2_data <- q2_data %>% 
+   mutate(height_range_id = factor(height_range_id, 0:10)))
+```
+
+I'd also like to sort my data in order of increasing `height_range_id`.
+
+```{r}
+(q2_data <- q2_data %>% 
+   arrange(height_range_id))
+```
+
+There are some trees that do not have location information or date planted information, filter those out.
+
+```{r}
+(q2_data <- q2_data %>% 
+   filter(!is.na(longitude) | !is.na(latitude) | !is.na(date_planted)))
+```
+
+I may create some categorical variables based on diameter and date_planted, but will leave it for now. 
+
+
 
 

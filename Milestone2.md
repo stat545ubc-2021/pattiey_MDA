@@ -34,7 +34,7 @@ Research questions are changed from milestone 1 to be more specific.
 3.  How does the number of trees planted change depending on the season?
 
 4.  Is there a relationship between the height and width of trees? Are
-    these trees found in geographically similar areas or are they
+    these larger trees found in geographically similar areas or are they
     scattered throughout the city?
 
 ## 1.2 Summarizing and graphing
@@ -425,8 +425,8 @@ surrounding the Summer.
 ### Research Question 4
 
 *Is there a relationship between the height and width of trees? Are
-these trees found in geographically similar areas or are they scattered
-throughout the city?*
+these larger trees found in geographically similar areas or are they
+scattered throughout the city?*
 
 Since `height_range_id` is an ID variable, it can be viewed as a
 categorical variable. Let’s look at the summary statistics of `diameter`
@@ -496,7 +496,7 @@ Here, we plot the diameter against `height_range_id` using a jitter
 plot.
 
 ``` r
-vancouver_trees %>% ggplot(aes(factor(height_range_id, levels = 1:10), diameter)) + geom_jitter(height = 0, alpha = 0.1) + labs(y = "Diameter", x = "Height range ID", title = "Tree diameter vs. Height range ID")
+vancouver_trees %>% ggplot(aes(factor(height_range_id, levels = 0:10), diameter)) + geom_jitter(height = 0, alpha = 0.1) + labs(y = "Diameter", x = "Height range ID", title = "Tree diameter vs. Height range ID")
 ```
 
 ![](Milestone2_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
@@ -506,7 +506,7 @@ This is extremely difficult to read. Use a
 transform on the y-axis.
 
 ``` r
-vancouver_trees %>% ggplot(aes(factor(height_range_id, levels = 1:10), diameter)) + geom_jitter(height = 0, alpha = 0.2) + scale_y_continuous(trans = 'log10') + labs(y = "Diameter", x = "Height range ID", title = "Tree diameter vs. Height range ID")
+vancouver_trees %>% ggplot(aes(factor(height_range_id, levels = 0:10), diameter)) + geom_jitter(height = 0, alpha = 0.2) + scale_y_continuous(trans = 'log10') + labs(y = "Diameter", x = "Height range ID", title = "Tree diameter vs. Height range ID")
 ```
 
     ## Warning: Transformation introduced infinite values in continuous y-axis
@@ -514,14 +514,14 @@ vancouver_trees %>% ggplot(aes(factor(height_range_id, levels = 1:10), diameter)
     ## Warning: Removed 92 rows containing missing values (geom_point).
 
 ![](Milestone2_files/figure-gfm/unnamed-chunk-18-1.png)<!-- --> This
-still is not great, but is better. You can see that as the
+still is not great, but is better. You can see that, generally, as the
 `height_range_id` increases, the number of smaller diameter trees
 decreases. Perhaps using a box plot will give something more
 interpretable.
 
 ``` r
 vancouver_trees %>% 
-  ggplot(aes(factor(height_range_id, levels = 1:10), diameter)) + 
+  ggplot(aes(factor(height_range_id, levels = 0:10), diameter)) + 
   geom_boxplot(alpha = 0.2) + 
   scale_y_continuous(trans = 'log10') + 
   labs(y = "Diameter", 
@@ -535,10 +535,90 @@ vancouver_trees %>%
 
 ![](Milestone2_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
-Indeed it does. From this, it is clear that as the height increases, the
-average tree diameter also increases.
+Indeed it does. From this, it is clear that in general, as the height
+increases, the average tree diameter also increases.
+
+For fun, I want to see if the presence of a root barrier has any
+relationship with diameter.
+
+``` r
+vancouver_trees %>% 
+  ggplot(aes(factor(height_range_id, levels = 0:10), diameter, color = root_barrier)) + 
+  geom_boxplot(alpha = 0.2) + 
+  scale_y_continuous(trans = 'log10') + 
+  labs(y = "Diameter", 
+       x = "Height range ID", 
+       title = "Box plot of tree diameter vs. height range ID",
+       color = "Root barrier")
+```
+
+    ## Warning: Transformation introduced infinite values in continuous y-axis
+
+    ## Warning: Removed 92 rows containing non-finite values (stat_boxplot).
+
+![](Milestone2_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+In general, it appears that the presence of a root barrier corresponds
+to a lower tree diameter.
 
 ## 1.3 Assess research questions
+
+### Research Question 1
+
+*How has the frequency of trees planted by neighbourhood changed over
+time? And on a broader scale, how has it changed by decade? This could
+reflect the rate of development of certain neighbourhoods over time.*
+
+I am closer to answering this question in that I have identified the
+different distributions of number of trees planted per year in each
+neighbourhood. From this we see that the 2000’s had the highest average
+number of neighbourhood trees planted annually. What remains unclear is
+which neighbourhoods saw the greatest amounts of growth in each decade
+and which neighbourhoods had the biggest variation of trees planted
+between decades. I’d like to refine my research question to be: which
+neighbourhoods saw the greatest rate of trees planted per decade? Are
+there any neighbourhoods that have only recently seen a high rate of
+tree planting (last 5 years?) and conversely, are there any
+neighbourhoods that have drastically slowed down in their rate of tree
+planting?
+
+### Research Question 2
+
+*Is there a difference in the frequency of certain species of trees
+between neighbourhoods? What are the most popular species of tree within
+Vancouver and which neighbourhoods are these trees mostly found?*
+
+I have identified the most popular types of trees within each
+neighbourhood and throughout Vancouver as a whole. What remains to be
+answered is the specific neighbourhoods where the most popular trees are
+mainly found. It would also be interesting to see if all the popular
+trees are concentrated in one area in the neighbourhood or are scattered
+around.
+
+### Research Question 3
+
+*How does the number of trees planted change depending on the season?*
+
+I think this question has been sufficiently answered. The number of
+trees planted decreases as the weather gets warmer in the Summer months,
+as well as in late December/early January surrounding the holiday
+season. It may be interesting to create a time series model for the
+number of trees planted through time.
+
+### Research Question 4
+
+*Is there a relationship between the height and width of trees? Are
+these larger trees found in geographically similar areas or are they
+scattered throughout the city?*
+
+From the data exploration, we found that on average, a larger
+`height_range_id` corresponds to a larger diameter, which answers the
+first part of the question. The second part of the research remains
+unanswered. It would be interesting to explore the geographic
+relationship between the trees that are taller (ex. `height_range_id`
+&gt; 5) and wider in diameter (ex. `diameter > 20`). It would also be
+interesting to see if the age of a tree (based on `date_planted`) has
+any relationship with the height or diameter of a tree.
 
 # Task 2: Tidy my data
 
@@ -654,3 +734,291 @@ untidy_vancouver_trees %>%
     ## # … with 146,601 more rows, and 1 more variable: date_planted <date>
 
 ## 2.3 Picking 2 research questions
+
+I would like to continue exploring research questions 1 and 4.
+
+### Research Question 1
+
+*How has the frequency of trees planted by neighbourhood changed over
+time? Which neighbourhoods saw the greatest rate of trees planted per
+decade? Are there any neighbourhoods that have only recently seen a high
+rate of tree planting (last 5 years?) and conversely, are there any
+neighbourhoods that have drastically slowed down in their rate of tree
+planting?*
+
+This question mainly interests me because of the potential it has to
+serve as a signal of development in neighbourhoods.There are many
+different angles from which I can approach this question.
+
+I want to explore the refined version of this question, looking at the
+relative rate of trees planted per decade in each neighbourhood.
+
+To answer this question, I need to first filter out observations that do
+not have `date_planted` information.
+
+``` r
+# keep modified dataset to answer question 1 as q1_data
+(q1_data <- vancouver_trees %>% 
+  filter(!is.na(date_planted)))
+```
+
+    ## # A tibble: 70,063 × 23
+    ##    tree_id civic_number std_street    genus_name species_name cultivar_name  
+    ##      <dbl>        <dbl> <chr>         <chr>      <chr>        <chr>          
+    ##  1  149556          494 W 58TH AV     ULMUS      AMERICANA    BRANDON        
+    ##  2  149563          450 W 58TH AV     ZELKOVA    SERRATA      <NA>           
+    ##  3  149579         4994 WINDSOR ST    STYRAX     JAPONICA     <NA>           
+    ##  4  149590          858 E 39TH AV     FRAXINUS   AMERICANA    AUTUMN APPLAUSE
+    ##  5  149604         5032 WINDSOR ST    ACER       CAMPESTRE    <NA>           
+    ##  6  149617         4909 SHERBROOKE ST ACER       PLATANOIDES  COLUMNARE      
+    ##  7  149618         4925 SHERBROOKE ST ACER       PLATANOIDES  COLUMNARE      
+    ##  8  149619         4969 SHERBROOKE ST ACER       PLATANOIDES  COLUMNARE      
+    ##  9  149625          720 E 39TH AV     FRAXINUS   AMERICANA    AUTUMN APPLAUSE
+    ## 10  149626          736 E 39TH AV     TILIA      EUCHLORA   X <NA>           
+    ## # … with 70,053 more rows, and 17 more variables: common_name <chr>,
+    ## #   assigned <chr>, root_barrier <chr>, plant_area <chr>,
+    ## #   on_street_block <dbl>, on_street <chr>, neighbourhood_name <chr>,
+    ## #   street_side_name <chr>, height_range_id <dbl>, diameter <dbl>, curb <chr>,
+    ## #   date_planted <date>, longitude <dbl>, latitude <dbl>, year_planted <dbl>,
+    ## #   decade_planted <fct>, season_planted <chr>
+
+I only really need neighbourhood and date information in order to answer
+this question, so I can just select the relevant variables.
+
+``` r
+(q1_data <- q1_data %>% 
+  select(neighbourhood_name, date_planted))
+```
+
+    ## # A tibble: 70,063 × 2
+    ##    neighbourhood_name       date_planted
+    ##    <chr>                    <date>      
+    ##  1 MARPOLE                  1999-01-13  
+    ##  2 MARPOLE                  1996-05-31  
+    ##  3 KENSINGTON-CEDAR COTTAGE 1993-11-22  
+    ##  4 KENSINGTON-CEDAR COTTAGE 1996-04-29  
+    ##  5 KENSINGTON-CEDAR COTTAGE 1993-12-17  
+    ##  6 KENSINGTON-CEDAR COTTAGE 1993-12-16  
+    ##  7 KENSINGTON-CEDAR COTTAGE 1993-12-16  
+    ##  8 KENSINGTON-CEDAR COTTAGE 1993-12-16  
+    ##  9 KENSINGTON-CEDAR COTTAGE 1993-12-03  
+    ## 10 KENSINGTON-CEDAR COTTAGE 1993-12-03  
+    ## # … with 70,053 more rows
+
+Since I’m interested in looking at the annual rate of planting, I’ll
+create a `year_planted` variable.
+
+``` r
+(q1_data <- q1_data %>% 
+  mutate(year_planted = lubridate::year(date_planted)))
+```
+
+    ## # A tibble: 70,063 × 3
+    ##    neighbourhood_name       date_planted year_planted
+    ##    <chr>                    <date>              <dbl>
+    ##  1 MARPOLE                  1999-01-13           1999
+    ##  2 MARPOLE                  1996-05-31           1996
+    ##  3 KENSINGTON-CEDAR COTTAGE 1993-11-22           1993
+    ##  4 KENSINGTON-CEDAR COTTAGE 1996-04-29           1996
+    ##  5 KENSINGTON-CEDAR COTTAGE 1993-12-17           1993
+    ##  6 KENSINGTON-CEDAR COTTAGE 1993-12-16           1993
+    ##  7 KENSINGTON-CEDAR COTTAGE 1993-12-16           1993
+    ##  8 KENSINGTON-CEDAR COTTAGE 1993-12-16           1993
+    ##  9 KENSINGTON-CEDAR COTTAGE 1993-12-03           1993
+    ## 10 KENSINGTON-CEDAR COTTAGE 1993-12-03           1993
+    ## # … with 70,053 more rows
+
+Rather than looking at the data from a tree-by-tree basis, I’d rather
+explore by neighbourhood.
+
+``` r
+(q1_data <- q1_data %>% 
+  group_by(neighbourhood_name, year_planted) %>% 
+  summarise(trees_planted = n()))
+```
+
+    ## `summarise()` has grouped output by 'neighbourhood_name'. You can override using the `.groups` argument.
+
+    ## # A tibble: 671 × 3
+    ## # Groups:   neighbourhood_name [22]
+    ##    neighbourhood_name year_planted trees_planted
+    ##    <chr>                     <dbl>         <int>
+    ##  1 ARBUTUS-RIDGE              1989            41
+    ##  2 ARBUTUS-RIDGE              1990            76
+    ##  3 ARBUTUS-RIDGE              1991            16
+    ##  4 ARBUTUS-RIDGE              1992            81
+    ##  5 ARBUTUS-RIDGE              1993            18
+    ##  6 ARBUTUS-RIDGE              1994            58
+    ##  7 ARBUTUS-RIDGE              1995           151
+    ##  8 ARBUTUS-RIDGE              1996            95
+    ##  9 ARBUTUS-RIDGE              1997            61
+    ## 10 ARBUTUS-RIDGE              1998            59
+    ## # … with 661 more rows
+
+I would like 1 row per neighbourhood, with each annual number of trees
+planted as a variable.
+
+``` r
+(q1_data <- q1_data %>% 
+  pivot_wider(names_from = year_planted, values_from = trees_planted))
+```
+
+    ## # A tibble: 22 × 32
+    ## # Groups:   neighbourhood_name [22]
+    ##    neighbourhood_name    `1989` `1990` `1991` `1992` `1993` `1994` `1995` `1996`
+    ##    <chr>                  <int>  <int>  <int>  <int>  <int>  <int>  <int>  <int>
+    ##  1 ARBUTUS-RIDGE             41     76     16     81     18     58    151     95
+    ##  2 DOWNTOWN                   6     32     21     16     13     63     95     18
+    ##  3 DUNBAR-SOUTHLANDS         65     27     24     71     36     37    141    202
+    ##  4 FAIRVIEW                  NA     60     14      1      4      3     97     64
+    ##  5 GRANDVIEW-WOODLAND        26     99     13     29     61    108     60     54
+    ##  6 HASTINGS-SUNRISE          NA    389     56    299    411    316    224    231
+    ##  7 KENSINGTON-CEDAR COT…      7     41     85    131    302    251    206    368
+    ##  8 KERRISDALE                 2     31      7     33     87      5    119    127
+    ##  9 KILLARNEY                 30     20     34     43     90    161    159    150
+    ## 10 KITSILANO                 NA     55      9     10     62     99    101    124
+    ## # … with 12 more rows, and 23 more variables: 1997 <int>, 1998 <int>,
+    ## #   1999 <int>, 2000 <int>, 2001 <int>, 2002 <int>, 2003 <int>, 2004 <int>,
+    ## #   2005 <int>, 2006 <int>, 2007 <int>, 2008 <int>, 2009 <int>, 2010 <int>,
+    ## #   2011 <int>, 2012 <int>, 2013 <int>, 2014 <int>, 2015 <int>, 2016 <int>,
+    ## #   2017 <int>, 2018 <int>, 2019 <int>
+
+There are a few NA values, these are years where no trees were recorded,
+replace the NA values with 0
+
+``` r
+(q1_data <- q1_data %>% 
+  replace(is.na(.), 0))
+```
+
+    ## # A tibble: 22 × 32
+    ## # Groups:   neighbourhood_name [22]
+    ##    neighbourhood_name    `1989` `1990` `1991` `1992` `1993` `1994` `1995` `1996`
+    ##    <chr>                  <int>  <int>  <int>  <int>  <int>  <int>  <int>  <int>
+    ##  1 ARBUTUS-RIDGE             41     76     16     81     18     58    151     95
+    ##  2 DOWNTOWN                   6     32     21     16     13     63     95     18
+    ##  3 DUNBAR-SOUTHLANDS         65     27     24     71     36     37    141    202
+    ##  4 FAIRVIEW                   0     60     14      1      4      3     97     64
+    ##  5 GRANDVIEW-WOODLAND        26     99     13     29     61    108     60     54
+    ##  6 HASTINGS-SUNRISE           0    389     56    299    411    316    224    231
+    ##  7 KENSINGTON-CEDAR COT…      7     41     85    131    302    251    206    368
+    ##  8 KERRISDALE                 2     31      7     33     87      5    119    127
+    ##  9 KILLARNEY                 30     20     34     43     90    161    159    150
+    ## 10 KITSILANO                  0     55      9     10     62     99    101    124
+    ## # … with 12 more rows, and 23 more variables: 1997 <int>, 1998 <int>,
+    ## #   1999 <int>, 2000 <int>, 2001 <int>, 2002 <int>, 2003 <int>, 2004 <int>,
+    ## #   2005 <int>, 2006 <int>, 2007 <int>, 2008 <int>, 2009 <int>, 2010 <int>,
+    ## #   2011 <int>, 2012 <int>, 2013 <int>, 2014 <int>, 2015 <int>, 2016 <int>,
+    ## #   2017 <int>, 2018 <int>, 2019 <int>
+
+### Research Question 4 (Now referred to as question 2)
+
+*Is there a relationship between the height and width of trees? Are
+these larger trees found in geographically similar areas or are they
+scattered throughout the city?*
+
+I’d like to continue exploring this questions because I have not yet
+answered the second part of it. I’d also like to add a part to this
+question that explores the relationship between the age of a tree (based
+on `date_planted`) and the size of the tree.
+
+I would like to only keep the relevant variables to the question, which
+are `height_range_id`, `diameter`, `latitude`, `longitude`,
+`date_planted`. It may be useful to have `on_street_block`, `on_street`,
+`root_barrier`, `common_name`, and `neighbourhood_name` as well for the
+exploration.
+
+``` r
+(q2_data <- vancouver_trees %>% 
+  select(height_range_id, diameter, latitude, longitude, date_planted, on_street_block, on_street, root_barrier, common_name, neighbourhood_name))
+```
+
+    ## # A tibble: 146,611 × 10
+    ##    height_range_id diameter latitude longitude date_planted on_street_block
+    ##              <dbl>    <dbl>    <dbl>     <dbl> <date>                 <dbl>
+    ##  1               2     10       49.2     -123. 1999-01-13               400
+    ##  2               4     10       49.2     -123. 1996-05-31               400
+    ##  3               3      4       49.2     -123. 1993-11-22              4900
+    ##  4               4     18       49.2     -123. 1996-04-29               800
+    ##  5               2      9       49.2     -123. 1993-12-17              5000
+    ##  6               2      5       49.2     -123. NA                       500
+    ##  7               3     15       49.2     -123. 1993-12-16              4900
+    ##  8               3     14       49.2     -123. 1993-12-16              4900
+    ##  9               2     16       49.2     -123. 1993-12-16              4900
+    ## 10               2      7.5     49.2     -123. 1993-12-03               700
+    ## # … with 146,601 more rows, and 4 more variables: on_street <chr>,
+    ## #   root_barrier <chr>, common_name <chr>, neighbourhood_name <chr>
+
+Height range ID is currently a double type, since it is an ID value, it
+would make more sense to cast it to a factor.
+
+``` r
+(q2_data <- q2_data %>% 
+   mutate(height_range_id = factor(height_range_id, 0:10)))
+```
+
+    ## # A tibble: 146,611 × 10
+    ##    height_range_id diameter latitude longitude date_planted on_street_block
+    ##    <fct>              <dbl>    <dbl>     <dbl> <date>                 <dbl>
+    ##  1 2                   10       49.2     -123. 1999-01-13               400
+    ##  2 4                   10       49.2     -123. 1996-05-31               400
+    ##  3 3                    4       49.2     -123. 1993-11-22              4900
+    ##  4 4                   18       49.2     -123. 1996-04-29               800
+    ##  5 2                    9       49.2     -123. 1993-12-17              5000
+    ##  6 2                    5       49.2     -123. NA                       500
+    ##  7 3                   15       49.2     -123. 1993-12-16              4900
+    ##  8 3                   14       49.2     -123. 1993-12-16              4900
+    ##  9 2                   16       49.2     -123. 1993-12-16              4900
+    ## 10 2                    7.5     49.2     -123. 1993-12-03               700
+    ## # … with 146,601 more rows, and 4 more variables: on_street <chr>,
+    ## #   root_barrier <chr>, common_name <chr>, neighbourhood_name <chr>
+
+I’d also like to sort my data in order of increasing `height_range_id`.
+
+``` r
+(q2_data <- q2_data %>% 
+   arrange(height_range_id))
+```
+
+    ## # A tibble: 146,611 × 10
+    ##    height_range_id diameter latitude longitude date_planted on_street_block
+    ##    <fct>              <dbl>    <dbl>     <dbl> <date>                 <dbl>
+    ##  1 0                    4       NA         NA  NA                      4100
+    ##  2 0                    6       49.2     -123. NA                      3600
+    ##  3 0                   28.5     49.3     -123. NA                      3400
+    ##  4 0                    0       NA         NA  NA                      3800
+    ##  5 0                    0       NA         NA  NA                      4500
+    ##  6 0                    3       49.3     -123. 2010-10-20               300
+    ##  7 0                    3       49.3     -123. 2010-10-20               300
+    ##  8 0                    0       NA         NA  NA                      6000
+    ##  9 0                    6.5     49.2     -123. 2010-03-08              2500
+    ## 10 0                    8       49.2     -123. 2010-03-08              2500
+    ## # … with 146,601 more rows, and 4 more variables: on_street <chr>,
+    ## #   root_barrier <chr>, common_name <chr>, neighbourhood_name <chr>
+
+There are some trees that do not have location information or date
+planted information, filter those out.
+
+``` r
+(q2_data <- q2_data %>% 
+   filter(!is.na(longitude) | !is.na(latitude) | !is.na(date_planted)))
+```
+
+    ## # A tibble: 135,158 × 10
+    ##    height_range_id diameter latitude longitude date_planted on_street_block
+    ##    <fct>              <dbl>    <dbl>     <dbl> <date>                 <dbl>
+    ##  1 0                    6       49.2     -123. NA                      3600
+    ##  2 0                   28.5     49.3     -123. NA                      3400
+    ##  3 0                    3       49.3     -123. 2010-10-20               300
+    ##  4 0                    3       49.3     -123. 2010-10-20               300
+    ##  5 0                    6.5     49.2     -123. 2010-03-08              2500
+    ##  6 0                    8       49.2     -123. 2010-03-08              2500
+    ##  7 0                    3       NA         NA  2010-03-11              1300
+    ##  8 0                    3       NA         NA  2010-03-11              1300
+    ##  9 0                    3       NA         NA  2010-03-11              1300
+    ## 10 0                   21       49.2     -123. NA                      6200
+    ## # … with 135,148 more rows, and 4 more variables: on_street <chr>,
+    ## #   root_barrier <chr>, common_name <chr>, neighbourhood_name <chr>
+
+I may create some categorical variables based on diameter and
+date\_planted, but will leave it for now.
