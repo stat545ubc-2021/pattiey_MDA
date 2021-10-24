@@ -42,6 +42,7 @@ Sharpen results obtained from previous milestone by:
 | `README.md` | README file to describe this project and its structure |
 | `Milestone1.md` | File containing work for Milestone 1 |
 | `Milestone2.md` | File containing work for Milestone 2 |
+| `mini-project-3.md` | File containing instructions and work for Milestone 3|
 
 ### R Markdown files
 
@@ -49,6 +50,7 @@ Sharpen results obtained from previous milestone by:
 | :--- | ---: |
 | `Milestone1.Rmd` | R Markdown to generate `Milestone1.md` |
 | `Milestone2.Rmd` | R Markdown to generate `Milestone2.md` |
+| `mini-project-3.Rmd` | R Markdown to generate `mini-project-3.md` |
 
 ### Other files/directories
 
