@@ -60,8 +60,16 @@ them here.
 
 <!-------------------------- Start your work below ---------------------------->
 
-1.  *FILL\_THIS\_IN*
-2.  *FILL\_THIS\_IN*
+1.  *How has the frequency of trees planted by neighbourhood changed
+    over time? Which neighbourhoods saw the greatest rate of trees
+    planted per decade? Are there any neighbourhoods that have only
+    recently seen a high rate of tree planting (last 5 years?) and
+    conversely, are there any neighbourhoods that have drastically
+    slowed down in their rate of tree planting?*
+2.  *Is there a relationship between the height and width of trees? Are
+    these larger trees found in geographically similar areas or are they
+    scattered throughout the city? Alternatively, is there a
+    relationship between age and the diameter of tree?*
     <!----------------------------------------------------------------------------->
 
 # Exercise 1: Special Data Types (10)
@@ -77,6 +85,73 @@ you’d like). If you don’t have such a plot, you’ll need to make one.
 Place the code for your plot below.
 
 <!-------------------------- Start your work below ---------------------------->
+
+For this task, I would like to use the histogram plot of number of trees
+planted by day of the year, contained in the work for research question
+3 of Milestone 2. This graph colours by season planted.
+
+First, load the necessary packages.
+
+``` r
+library(lubridate)
+```
+
+    ## 
+    ## Attaching package: 'lubridate'
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     date, intersect, setdiff, union
+
+``` r
+library(broom) # Used later in this milestone
+```
+
+Create the `season_planted` categorical variable.
+
+``` r
+vancouver_trees <- vancouver_trees %>% 
+  mutate(season_planted = case_when(
+    month(date_planted) %in% 3:5 ~ "Spring",
+    month(date_planted) %in% 6:8 ~ "Summer",
+    month(date_planted) %in% 9:11 ~ "Autumn",
+    is.na(month(date_planted)) ~ "NA",
+    # if the month is not in any of those other ranges, it must be Winter
+    TRUE ~ "Winter"
+  ))
+
+vancouver_trees %>% 
+  group_by(season_planted) %>% 
+  summarise(count = n())
+```
+
+    ## # A tibble: 5 × 2
+    ##   season_planted count
+    ##   <chr>          <int>
+    ## 1 Autumn         14999
+    ## 2 NA             76548
+    ## 3 Spring         20663
+    ## 4 Summer           773
+    ## 5 Winter         33628
+
+Now the histogram plot of the number of trees planted each day of the
+year, coloured by season with a binwidth of 7
+
+``` r
+vancouver_trees %>% 
+  # Filter out trees without date information
+  filter(!is.na(date_planted)) %>% 
+  # Extract just the day of the year from date_planted
+  mutate(day = yday(date_planted)) %>% 
+  ggplot(aes(day, fill = season_planted)) + 
+  geom_histogram(binwidth = 7) + 
+  labs(x = "Day of the year", 
+       fill = "Season planted", 
+       title = "Distribution of trees planted \nby day of the year, binwidth = 7")
+```
+
+![](Milestone3_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
 <!----------------------------------------------------------------------------->
 
 Now, choose two of the following tasks.
@@ -117,12 +192,61 @@ Now, choose two of the following tasks.
 
 <!-------------------------- Start your work below ---------------------------->
 
-**Task Number**: FILL\_THIS\_IN
+**Task Number 1**: I will reorder the `season_planted` using
+`fct_reorder` based on the minimum `yday` transformed `date_planted`
+variable of each season. Based on this, the resulting ordering of
+`season_planted` should be `Winter`, `Spring`, `Summer`, `Autumn`, then
+`NA` since that is the chronological ordering of the seasons.
 
+``` r
+# First cast `season_planted` as a factor
+vancouver_trees <- vancouver_trees %>% mutate(season_planted = factor(season_planted))
+levels(vancouver_trees$season_planted)
+```
+
+    ## [1] "Autumn" "NA"     "Spring" "Summer" "Winter"
+
+``` r
+vancouver_trees <- vancouver_trees %>% mutate(season_planted = fct_reorder(season_planted, yday(date_planted), min))
+```
+
+Now plot the histogram again. This time, the ordering of the legend
+should reflect the new ordering of `season_planted`
+
+``` r
+vancouver_trees %>% 
+  # Filter out trees without date information
+  filter(!is.na(date_planted)) %>% 
+  # Extract just the day of the year from date_planted
+  mutate(day = yday(date_planted)) %>% 
+  ggplot(aes(day, fill = season_planted)) + 
+  geom_histogram(binwidth = 7) + 
+  labs(x = "Day of the year", 
+       fill = "Season planted", 
+       title = "Distribution of trees planted \nby day of the year, binwidth = 7")
+```
+
+![](Milestone3_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 <!----------------------------------------------------------------------------->
+
 <!-------------------------- Start your work below ---------------------------->
 
-**Task Number**: FILL\_THIS\_IN
+**Task Number 3**: I will be using the `year()` function from lubridate
+to extract the year from the `date_planted` variable in order to answer
+research question 1. I need the year from the date in order to be able
+to group by year to explore the annual number of trees planted per
+neighbourhood. This will also come in handy for research question 2 in
+order to measure the age of a tree in years.
+
+``` r
+vancouver_trees <- vancouver_trees %>% 
+  mutate(year_planted = year(date_planted))
+```
+
+(In the previous task, I also used `yday()` from lubridate to extract
+the day of the year from the date in order to find the distribution of
+trees planted each day, although I did not create a new variable in the
+dataset with this)
 
 <!----------------------------------------------------------------------------->
 
@@ -135,9 +259,11 @@ Pick a research question, and pick a variable of interest (we’ll call it
 
 <!-------------------------- Start your work below ---------------------------->
 
-**Research Question**: FILL\_THIS\_IN
+**Research Question**: I will explore the last part of the second
+research question *Is there a relationship between age and the diameter
+of tree?*
 
-**Variable of interest**: FILL\_THIS\_IN
+**Variable of interest**: diameter
 
 <!----------------------------------------------------------------------------->
 
@@ -162,6 +288,30 @@ specifics in STAT 545.
     -   You could use `lm()` to test for significance of regression.
 
 <!-------------------------- Start your work below ---------------------------->
+
+I will create a linear model to explore the relationship between a
+tree’s age in days and its diameter.
+
+``` r
+# Find the age of a tree in days
+vancouver_trees <- vancouver_trees %>% mutate(age_in_days = as.numeric(Sys.Date() - date_planted, unit = "days"))
+
+# Create linear model of diameter vs. age
+(age_diameter_model <- lm(diameter ~ age_in_days, vancouver_trees))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = diameter ~ age_in_days, data = vancouver_trees)
+    ## 
+    ## Coefficients:
+    ## (Intercept)  age_in_days  
+    ##   0.7650117    0.0007712
+
+This gives a linear model of the form diameter = 0.7650117 +
+0.0007712\*(age\_in\_days), this suggests that for every one day
+increase in age, you expect to see a 0.0007712 increase in diameter.
+
 <!----------------------------------------------------------------------------->
 
 ## 2.2 (5 points)
@@ -179,6 +329,27 @@ Y, or a single value like a regression coefficient or a p-value.
     which broom function is not compatible.
 
 <!-------------------------- Start your work below ---------------------------->
+
+In order to determine the significance of relationship between age and
+tree diameter, look at the p-value corresponding to the coefficient for
+`age_in_days` in the model.
+
+``` r
+# Convert model to tibble using tidy in broom
+(model_tibble <- tidy(age_diameter_model))
+```
+
+    ## # A tibble: 2 × 5
+    ##   term        estimate  std.error statistic  p.value
+    ##   <chr>          <dbl>      <dbl>     <dbl>    <dbl>
+    ## 1 (Intercept) 0.765    0.0422          18.1 3.00e-73
+    ## 2 age_in_days 0.000771 0.00000607     127.  0
+
+The p-value we are interested in is found under the `p.value` column in
+the second row (where term == `age_in_days`). We see that this p-value
+is 0, which means that this value is accepted at any significance level.
+So, we cannot reject the hypothesis that there is a positive
+relationship between the age of a tree and its diameter.
 <!----------------------------------------------------------------------------->
 
 # Exercise 3: Reading and writing data
@@ -201,6 +372,23 @@ function.
     file, and remake it simply by knitting this Rmd file.
 
 <!-------------------------- Start your work below ---------------------------->
+
+I will take the summary table from research question 1 (number of trees
+planted by decade and neighbourhood), and write it as a csv file.
+
+``` r
+#First I need to recreate the summary table
+vancouver_trees <- vancouver_trees %>% 
+  mutate(decade_planted = cut(year_planted, breaks = c(1990, 2000, 2010, 2020), labels = c("90's", "00's", "10's")))
+
+vancouver_trees %>% 
+  group_by(neighbourhood_name, decade_planted) %>% 
+  summarise(count = n()) %>% 
+  write.csv(here::here("output", "trees_planted_by_decade_neighbourhood.csv"))
+```
+
+    ## `summarise()` has grouped output by 'neighbourhood_name'. You can override using the `.groups` argument.
+
 <!----------------------------------------------------------------------------->
 
 ## 3.2 (5 points)
@@ -213,6 +401,28 @@ folder. Use the functions `saveRDS()` and `readRDS()`.
     here.
 
 <!-------------------------- Start your work below ---------------------------->
+
+Save `age_diameter_model` as an RDS.
+
+``` r
+file_name <- "age_diameter_model.rds"
+age_diameter_model %>% saveRDS(here::here("output", file_name))
+```
+
+Load `age_diameter_model` from the RDS.
+
+``` r
+(age_diameter_model <- readRDS(here::here("output", file_name)))
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = diameter ~ age_in_days, data = vancouver_trees)
+    ## 
+    ## Coefficients:
+    ## (Intercept)  age_in_days  
+    ##   0.7650117    0.0007712
+
 <!----------------------------------------------------------------------------->
 
 # Tidy Repository

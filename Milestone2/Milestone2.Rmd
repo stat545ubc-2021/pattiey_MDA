@@ -218,6 +218,7 @@ vancouver_trees %>%
        fill = "Season planted", 
        title = "Distribution of trees planted \nby day of the year, binwidth = 1")
 ```
+
 From this, we see that there is one day in Autumn that appears to be an outlier with close to 800 trees planted in a single day. We also see that towards the Summer, as the weather starts getting warmer, tree planting slows down.
 
 Now plot with `binwidth = 7`. Each bin is a week.

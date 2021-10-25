@@ -1,9 +1,8 @@
 Milestone1
 ================
 pattiey
-04/10/2021
 
-# Pattie Ye’s Mini Data Analysis
+# Pattie Ye’s Mini Data Analysis: Milestone 1
 
 # Choosing a dataset from the `datateachr` package
 

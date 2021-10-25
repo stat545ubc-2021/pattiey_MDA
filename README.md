@@ -4,7 +4,7 @@
 
 - [x] Milestone 1: Due October 9, 2021
 - [x] Milestone 2: Due October 19, 2021
-- [ ] Milestone 3: Due October 28, 2021
+- [x] Milestone 3: Due October 28, 2021
 
 ## Purpose of this repository
 
@@ -35,27 +35,11 @@ Sharpen results obtained from previous milestone by:
 
 ## Description of files/directories within this repository
 
-### Markdown files
-
-| File name | Description |
+| File/Directory name | Description |
 | :--- | ---: |
 | `README.md` | README file to describe this project and its structure |
-| `Milestone1.md` | File containing work for Milestone 1 |
-| `Milestone2.md` | File containing work for Milestone 2 |
-| `mini-project-3.md` | File containing instructions and work for Milestone 3|
-
-### R Markdown files
-
-| File name | Description |
-| :--- | ---: |
-| `Milestone1.Rmd` | R Markdown to generate `Milestone1.md` |
-| `Milestone2.Rmd` | R Markdown to generate `Milestone2.md` |
-| `mini-project-3.Rmd` | R Markdown to generate `mini-project-3.md` |
-
-### Other files/directories
-
-| File name | Description |
-| :--- | ---: |
-| `Milestone1_files` | Directory containing figures for `Milestone1.md` | 
-| `Milestone2_files` | Directory containing figures for `Milestone2.md` | 
+| `Milestone1` | Directory containing work for Milestone 1 |
+| `Milestone2` | Directory containing work for Milestone 2 |
+| `Milestone3` | Directory containing work for Milestone 3 |
+| `output` | Directory containing output files generated in Milestone 3 |
 | `.gitignore` | Instructs Git on the files to ignore | 

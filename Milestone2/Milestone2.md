@@ -344,8 +344,9 @@ vancouver_trees %>%
        title = "Distribution of trees planted \nby day of the year, binwidth = 1")
 ```
 
-![](Milestone2_files/figure-gfm/unnamed-chunk-12-1.png)<!-- --> From
-this, we see that there is one day in Autumn that appears to be an
+![](Milestone2_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+From this, we see that there is one day in Autumn that appears to be an
 outlier with close to 800 trees planted in a single day. We also see
 that towards the Summer, as the weather starts getting warmer, tree
 planting slows down.
